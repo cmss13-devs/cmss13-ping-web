@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            html {
+                font-family: monospace;
+            }
+
+            #output {
+                display: flex;
+                flex-wrap: wrap;
+
+                gap: 20px;
+            }
+        </style>
+        <script>
+            const relays = ["uk", "eu-e", "eu-w", "aus", "us-e", "us-w", "asia-se"]
+
+            const runCheck = async (server, port) => {
+                return new Promise((resolve) => {
+
+                    const divElement = document.createElement("div");
+                    const h3 = document.createElement("h3");
+                    const link = document.createElement("a");
+                    link.href = `byond://${server}:${port}`;
+                    link.textContent = `byond://${server}:${port}`;
+
+                    h3.appendChild(link);
+                    divElement.appendChild(h3);
+
+                    document.getElementById("output").appendChild(divElement);
+
+                    const socket = new WebSocket(`ws://${server}:${port}`);
+
+                    const pingsSent = {};
+                    const pingTimes = [];
+
+                    socket.addEventListener('message', (event) => {
+                        pingTimes.push(Date.now() - pingsSent[event.data]);
+
+                        ping(Number(event.data) + 1);
+                    })
+
+                    socket.addEventListener('open', () => {
+                        ping(1);
+                    })
+
+                    socket.addEventListener('error', (event) => console.log(event))
+
+                    const ping = (iter) => {
+                        if(iter >= 10) {
+                            const child = document.createElement("p");
+                            child.textContent = `${Math.round(pingTimes.reduce((a, b) => a + b) / pingTimes.length * 100) / 100}ms`
+
+                            divElement.appendChild(child);
+
+                            socket.close()
+                            resolve(true)
+                        } else {
+                            pingsSent[String(iter)] = Date.now()
+                            socket.send(iter);
+                        }
+                    }
+                });
+
+            }
+
+            const main = async () => {
+                runCheck("direct.cm-ss13.com", 4000)
+                for (const server of relays) {
+                    runCheck(`${server}.cm-ss13.com`, 4000);
+                    runCheck(`${server}.cm-ss13.com`, 40000);
+                };
+            }
+        </script>
+    </head>
+    <body>
+        <p id="output"></p>
+        <script>main()</script>
+    </body>
+</html>
