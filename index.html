@@ -16,7 +16,7 @@
         <script>
             const relays = ["uk", "eu-e", "eu-w", "aus", "us-e", "us-w", "asia-se"]
 
-            const runCheck = async (server, port) => {
+            const runCheck = async (server, port, display) => {
                 return new Promise((resolve) => {
 
                     const divElement = document.createElement("div");
@@ -30,7 +30,7 @@
 
                     document.getElementById("output").appendChild(divElement);
 
-                    const socket = new WebSocket(`ws://${server}:${port}`);
+                    const socket = new WebSocket(`wss://${server}:${port}`);
 
                     const pingsSent = {};
                     const pingTimes = [];
@@ -66,10 +66,10 @@
             }
 
             const main = async () => {
-                runCheck("direct.cm-ss13.com", 4000)
+                runCheck("direct.cm-ss13.com", 4000, 3000)
                 for (const server of relays) {
-                    runCheck(`${server}.cm-ss13.com`, 4000);
-                    runCheck(`${server}.cm-ss13.com`, 40000);
+                    runCheck(`${server}.cm-ss13.com`, 4000, 3000);
+                    runCheck(`${server}.cm-ss13.com`, 40000, 30000);
                 };
             }
         </script>
