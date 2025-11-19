@@ -22,11 +22,16 @@
                     const divElement = document.createElement("div");
                     const h3 = document.createElement("h3");
                     const link = document.createElement("a");
-                    link.href = `byond://${server}:${port}`;
-                    link.textContent = `byond://${server}:${port}`;
+                    const child = document.createElement("p");
+
+                    link.href = `byond://${server}:${display}`;
+                    link.textContent = `byond://${server}:${display}`;
+
+                    child.textContent = "Pinging..."
 
                     h3.appendChild(link);
                     divElement.appendChild(h3);
+                    divElement.appendChild(child);
 
                     document.getElementById("output").appendChild(divElement);
 
@@ -48,18 +53,12 @@
                     socket.addEventListener('error', (event) => console.log(event))
 
                     const ping = (iter) => {
-                        if(iter >= 10) {
-                            const child = document.createElement("p");
-                            child.textContent = `${Math.round(pingTimes.reduce((a, b) => a + b) / pingTimes.length * 100) / 100}ms`
+                        if(pingTimes.length) {
+                            child.innerHTML = `avg: ${Math.round(pingTimes.reduce((a, b) => a + b) / pingTimes.length * 100) / 100}ms<br> min: ${Math.min(...pingTimes)}ms<br> max ${Math.max(...pingTimes)}ms`
+                        };
 
-                            divElement.appendChild(child);
-
-                            socket.close()
-                            resolve(true)
-                        } else {
-                            pingsSent[String(iter)] = Date.now()
-                            socket.send(iter);
-                        }
+                        pingsSent[String(iter)] = Date.now()
+                        socket.send(iter);
                     }
                 });
 
@@ -75,6 +74,8 @@
         </script>
     </head>
     <body>
+        <h1 style="text-decoration: underline;">CM-SS13 Relays</h1>
+
         <p id="output"></p>
         <script>main()</script>
     </body>
