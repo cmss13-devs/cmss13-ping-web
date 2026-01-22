@@ -65,10 +65,10 @@
             }
 
             const main = async () => {
-                runCheck("direct.cm-ss13.com", 4000, 3000)
+                runCheck("direct.cm-ss13.com", 4000, 1400)
                 for (const server of relays) {
-                    runCheck(`${server}.cm-ss13.com`, 4000, 3000);
-                    runCheck(`${server}.cm-ss13.com`, 40000, 30000);
+                    runCheck(`${server}.cm-ss13.com`, 4000, 1400);
+                    runCheck(`${server}.cm-ss13.com`, 40000, 14000);
                 };
             }
         </script>
